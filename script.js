@@ -1,7 +1,7 @@
 // --- CONFIGURACIÓN DE CONEXIÓN CON CLOUDFLARE WORKER (GROQ IA) ---
-const WORKER_URL = "https://groq-lulu.jorge-z-alto-o.workers.dev";
+const WORKER_URL = "https://groq-lulu.jorge-z-alto-o.workers.dev/";
 
-// Lista de modelos de Groq a probar automáticamente en orden si alguno falla
+// Lista de modelos de Groq a probar automáticamente si alguno falla
 const MODELOS_GROQ = [
     "llama-3.1-8b-instant",
     "llama3-8b-8192",
@@ -41,7 +41,7 @@ function moveEyes(x, y) {
     });
 }
 
-// Ojos mirando a lados aleatorios de vez en cuando
+// Movimiento ocular aleatorio en reposo
 setInterval(() => {
     if (!isProcessing && !isSpeaking) {
         const randomX = (Math.random() - 0.5) * 25;
@@ -75,7 +75,7 @@ if (SpeechRecognition) {
         const text = event.results[lastIndex][0].transcript.toLowerCase().trim();
         console.log("Escuchado:", text);
 
-        // Activación por palabra clave "Oye Lulú" o variantes
+        // Palabras de activación
         if (text.includes("oye lulú") || text.includes("oye lulu") || text.includes("lulú") || text.includes("lulu")) {
             let consulta = text
                 .replace("oye lulú", "")
@@ -113,7 +113,7 @@ if (SpeechRecognition) {
 }
 
 
-// --- 3. CONEXIÓN A GROQ CON SELECCIÓN AUTOMÁTICA DE MODELO QUE FUNCIONE ---
+// --- 3. CONEXIÓN A GROQ CON FALLBACK Y NORMALIZACIÓN DE NOMBRE DE MODELO ---
 async function consultarGroq(mensajeUsuario) {
     const ahora = new Date();
     const fechaHoraTexto = ahora.toLocaleString('es-MX', { 
@@ -127,10 +127,11 @@ CONTEXTO EN TIEMPO REAL:
 - Fecha y hora actual del usuario: ${fechaHoraTexto}.
 Usa este contexto si el usuario te pregunta la hora, el día o la fecha.`;
 
-    // Recorre automáticamente los modelos en la lista hasta que uno responda con éxito
     for (const modelo of MODELOS_GROQ) {
         try {
-            console.log("Probrando modelo Groq:", modelo);
+            // Fuerza minúsculas para evitar errores 404/model_not_found
+            const modeloLimpio = modelo.toLowerCase().trim();
+            console.log("Probrando modelo Groq:", modeloLimpio);
 
             const response = await fetch(WORKER_URL, {
                 method: "POST",
@@ -138,7 +139,7 @@ Usa este contexto si el usuario te pregunta la hora, el día o la fecha.`;
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    model: modelo,
+                    model: modeloLimpio,
                     messages: [
                         { role: "system", content: systemPrompt },
                         { role: "user", content: mensajeUsuario }
@@ -150,12 +151,12 @@ Usa este contexto si el usuario te pregunta la hora, el día o la fecha.`;
 
             const data = await response.json();
 
-            // Si el modelo funcionó y trajo mensaje válido
+            // Validación de respuesta correcta
             if (data.choices && data.choices[0] && data.choices[0].message) {
-                console.log("¡Éxito con el modelo!", modelo);
+                console.log("¡Éxito con el modelo!", modeloLimpio);
                 return data.choices[0].message.content.trim();
             } else {
-                console.warn(`El modelo ${modelo} falló, probando el siguiente...`, data.error || data);
+                console.warn(`El modelo ${modeloLimpio} falló, probando el siguiente...`, data.error || data);
             }
         } catch (error) {
             console.warn(`Error al conectar con el modelo ${modelo}:`, error);
@@ -166,7 +167,7 @@ Usa este contexto si el usuario te pregunta la hora, el día o la fecha.`;
 }
 
 
-// --- 4. SÍNTESIS DE VOZ E INTERACCIÓN CON OJOS ---
+// --- 4. SÍNTESIS DE VOZ Y MODULACIÓN VISUAL ---
 function speakResponse(texto) {
     if (!('speechSynthesis' in window)) {
         subtitleText.innerText = texto;
@@ -186,6 +187,7 @@ function speakResponse(texto) {
         isSpeaking = true;
         setFaceState('speaking', texto);
 
+        // Modulación dinámica de ojos durante el habla
         mouthAnimationInterval = setInterval(() => {
             const scale = 0.9 + Math.random() * 0.3;
             const pupilScale = 0.8 + Math.random() * 0.4;
@@ -226,7 +228,7 @@ function resetToListen() {
     try { recognition.start(); } catch(e){}
 }
 
-// Control de clases y estado visual
+// Control visual de estados
 function setFaceState(stateClass, text) {
     face.className = 'face-container ' + stateClass;
     subtitleText.innerText = text;
