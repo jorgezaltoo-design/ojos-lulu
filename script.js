@@ -1,15 +1,5 @@
-// --- CONFIGURACIÓN API GROQ ---
-// Obtener API Key de almacenamiento local o pedirla si no existe
-let GROQ_API_KEY = localStorage.getItem('groq_api_key') || '';
-
-if (!GROQ_API_KEY) {
-    GROQ_API_KEY = prompt("Ingresa tu API Key de Groq (gsk_...):");
-    if (GROQ_API_KEY) {
-        localStorage.setItem('groq_api_key', GROQ_API_KEY.trim());
-    }
-}
-
-const GROQ_MODEL = "llama3-8b-8192";
+// --- CONFIGURACIÓN DE CONEXIÓN CON CLOUDFLARE WORKER (GROQ IA) ---
+const WORKER_URL = "https://groq-lulu.jorge-z-alto-o.workers.dev";
 
 // Elementos DOM
 const face = document.getElementById('face');
@@ -114,7 +104,7 @@ if (SpeechRecognition) {
 }
 
 
-// --- 3. CONEXIÓN A GROQ IA (CON HORA Y FECHA REAL) ---
+// --- 3. CONEXIÓN A GROQ IA (VÍA CLOUDFLARE WORKER) ---
 async function consultarGroq(mensajeUsuario) {
     const ahora = new Date();
     const fechaHoraTexto = ahora.toLocaleString('es-MX', { 
@@ -129,14 +119,13 @@ CONTEXTO EN TIEMPO REAL:
 Usa este contexto si el usuario te pregunta la hora, el día o la fecha.`;
 
     try {
-        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        const response = await fetch(WORKER_URL, {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${GROQ_API_KEY}`,
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                model: GROQ_MODEL,
+                model: "llama3-8b-8192",
                 messages: [
                     { role: "system", content: systemPrompt },
                     { role: "user", content: mensajeUsuario }
@@ -149,8 +138,8 @@ Usa este contexto si el usuario te pregunta la hora, el día o la fecha.`;
         const data = await response.json();
         return data.choices[0].message.content.trim();
     } catch (error) {
-        console.error("Error Groq:", error);
-        return "Lo siento, tuve un problema al conectarme a la IA de Groq.";
+        console.error("Error Groq Worker:", error);
+        return "Lo siento, tuve un problema al conectarme al servidor de Lulú.";
     }
 }
 
