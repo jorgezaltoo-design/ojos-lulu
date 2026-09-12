@@ -136,7 +136,19 @@ Usa este contexto si el usuario te pregunta la hora, el día o la fecha.`;
         });
 
         const data = await response.json();
-        return data.choices[0].message.content.trim();
+        
+        // Si Groq o el Worker devolvieron un objeto de error
+        if (data.error) {
+            console.error("Respuesta de error del Worker/Groq:", data.error);
+            return "Ocurrió un error en la respuesta de la IA.";
+        }
+
+        if (data.choices && data.choices[0] && data.choices[0].message) {
+            return data.choices[0].message.content.trim();
+        } else {
+            console.error("Respuesta inesperada:", data);
+            return "No recibí respuesta válida del servidor.";
+        }
     } catch (error) {
         console.error("Error Groq Worker:", error);
         return "Lo siento, tuve un problema al conectarme al servidor de Lulú.";
