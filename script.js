@@ -1,13 +1,11 @@
 // --- CONFIGURACIÓN DE CONEXIÓN CON CLOUDFLARE WORKER (GROQ IA) ---
 const WORKER_URL = "https://groq-lulu.jorge-z-alto-o.workers.dev/";
 
-// Lista de modelos de Groq 100% activos y vigentes
+// Solo modelos 100% activos en la API de Groq actualmente
 const MODELOS_GROQ = [
     "llama-3.1-8b-instant",
     "llama-3.3-70b-versatile",
-    "llama3-70b-8192",
-    "qwen-2.5-70b-instruct",
-    "gemma2-9b-it" // Si vuelve a fallar este último, la lista usará los primeros 4
+    "llama3-70b-8192"
 ];
 
 // Elementos DOM
