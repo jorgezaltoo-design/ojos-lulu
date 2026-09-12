@@ -125,7 +125,7 @@ Usa este contexto si el usuario te pregunta la hora, el día o la fecha.`;
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                model: "llama3-8b-8192",
+                model: "llama-3.1-8b-instant",
                 messages: [
                     { role: "system", content: systemPrompt },
                     { role: "user", content: mensajeUsuario }
@@ -164,7 +164,7 @@ function speakResponse(texto) {
         isSpeaking = true;
         setFaceState('speaking', texto);
 
-        // Hacer que los ojos modulen (dilaten y se muevan) al ritmo del habla
+        // Hacer que los ojos modulen al ritmo del habla
         mouthAnimationInterval = setInterval(() => {
             const scale = 0.9 + Math.random() * 0.3;
             const pupilScale = 0.8 + Math.random() * 0.4;
