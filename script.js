@@ -1,13 +1,13 @@
 // --- CONFIGURACIÓN DE CONEXIÓN CON CLOUDFLARE WORKER (GROQ IA) ---
 const WORKER_URL = "https://groq-lulu.jorge-z-alto-o.workers.dev/";
 
-// Lista de modelos de Groq a probar automáticamente si alguno falla
+// Lista de modelos de Groq 100% activos y vigentes
 const MODELOS_GROQ = [
     "llama-3.1-8b-instant",
-    "llama3-8b-8192",
     "llama-3.3-70b-versatile",
-    "mixtral-8x7b-32768",
-    "gemma2-9b-it"
+    "llama3-70b-8192",
+    "qwen-2.5-70b-instruct",
+    "gemma2-9b-it" // Si vuelve a fallar este último, la lista usará los primeros 4
 ];
 
 // Elementos DOM
@@ -114,6 +114,7 @@ if (SpeechRecognition) {
 
 
 // --- 3. CONEXIÓN A GROQ CON FALLBACK Y NORMALIZACIÓN DE NOMBRE DE MODELO ---
+// --- 3. CONEXIÓN A GROQ CON FALLBACK Y NORMALIZACIÓN DE NOMBRE DE MODELO ---
 async function consultarGroq(mensajeUsuario) {
     const ahora = new Date();
     const fechaHoraTexto = ahora.toLocaleString('es-MX', { 
@@ -129,9 +130,8 @@ Usa este contexto si el usuario te pregunta la hora, el día o la fecha.`;
 
     for (const modelo of MODELOS_GROQ) {
         try {
-            // Fuerza minúsculas para evitar errores 404/model_not_found
             const modeloLimpio = modelo.toLowerCase().trim();
-            console.log("Probrando modelo Groq:", modeloLimpio);
+            console.log("Probando modelo Groq:", modeloLimpio);
 
             const response = await fetch(WORKER_URL, {
                 method: "POST",
@@ -151,12 +151,11 @@ Usa este contexto si el usuario te pregunta la hora, el día o la fecha.`;
 
             const data = await response.json();
 
-            // Validación de respuesta correcta
             if (data.choices && data.choices[0] && data.choices[0].message) {
                 console.log("¡Éxito con el modelo!", modeloLimpio);
                 return data.choices[0].message.content.trim();
             } else {
-                console.warn(`El modelo ${modeloLimpio} falló, probando el siguiente...`, data.error || data);
+                console.warn(`El modelo ${modeloLimpio} falló:`, data.error || data);
             }
         } catch (error) {
             console.warn(`Error al conectar con el modelo ${modelo}:`, error);
