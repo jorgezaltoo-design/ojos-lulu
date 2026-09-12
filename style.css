@@ -1,0 +1,171 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+body {
+    background-color: #020617;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* Ojos Cyberpunk Orgánicos */
+.face-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 85%;
+    max-width: 550px;
+    height: 260px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.eye-socket {
+    width: 140px;
+    height: 140px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.eye {
+    position: relative;
+    width: 130px;
+    height: 130px;
+    background: radial-gradient(circle, rgba(0, 242, 254, 0.15) 0%, rgba(2, 6, 23, 0.95) 75%);
+    border: 3px solid #00f2fe;
+    border-radius: 50%;
+    box-shadow: 0 0 30px rgba(0, 242, 254, 0.4), inset 0 0 20px rgba(0, 242, 254, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.1s ease, border-color 0.4s, box-shadow 0.4s;
+    overflow: hidden;
+}
+
+.iris {
+    position: relative;
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #00f2fe 0%, #0077ff 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 20px #00f2fe;
+    transition: transform 0.15s ease-out, width 0.3s, height 0.3s;
+}
+
+.pupil {
+    width: 32px;
+    height: 32px;
+    background-color: #020617;
+    border-radius: 50%;
+    transition: transform 0.2s ease, width 0.2s, height 0.2s;
+}
+
+.glare {
+    position: absolute;
+    top: 15%;
+    right: 20%;
+    width: 12px;
+    height: 12px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    opacity: 0.8;
+    box-shadow: 0 0 8px #ffffff;
+}
+
+.ring {
+    position: absolute;
+    width: 115%;
+    height: 115%;
+    border: 2px dashed rgba(0, 242, 254, 0.4);
+    border-radius: 50%;
+    animation: rotateRing 12s linear infinite;
+}
+
+@keyframes rotateRing {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* --- ANIMACIONES Y ESTADOS --- */
+
+/* Parpadeo de ojos */
+.blink .eye {
+    transform: scaleY(0.08) !important;
+}
+
+/* Estado Escuchando (Verde Neón) */
+.listening .eye {
+    border-color: #00ff87;
+    box-shadow: 0 0 40px rgba(0, 255, 135, 0.6), inset 0 0 25px rgba(0, 255, 135, 0.4);
+}
+.listening .iris {
+    background: radial-gradient(circle, #00ff87 0%, #00b359 100%);
+    box-shadow: 0 0 25px #00ff87;
+}
+.listening .pupil {
+    width: 42px;
+    height: 42px; /* Pupila dilatada al escuchar */
+}
+
+/* Estado Pensando (Rosa/Púrpura Neón) */
+.thinking .eye {
+    border-color: #ff007f;
+    box-shadow: 0 0 40px rgba(255, 0, 127, 0.6), inset 0 0 25px rgba(255, 0, 127, 0.4);
+}
+.thinking .iris {
+    background: radial-gradient(circle, #ff007f 0%, #7928ca 100%);
+    box-shadow: 0 0 25px #ff007f;
+    animation: thinkingPulse 0.5s infinite alternate ease-in-out;
+}
+
+@keyframes thinkingPulse {
+    0% { transform: scale(0.85); }
+    100% { transform: scale(1.15); }
+}
+
+/* Estado Hablando (Efecto Muestreo de Voz) */
+.speaking .iris {
+    box-shadow: 0 0 35px #00f2fe;
+}
+
+/* Interfaz Inferior HUD */
+.hud-container {
+    margin-top: 35px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 20px;
+    text-align: center;
+}
+
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    background-color: #00f2fe;
+    border-radius: 50%;
+    box-shadow: 0 0 12px #00f2fe;
+    margin-bottom: 12px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.subtitle-text {
+    color: #00f2fe;
+    font-size: 1rem;
+    letter-spacing: 1.5px;
+    text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+    max-width: 90vw;
+    line-height: 1.4;
+    min-height: 2.8em;
+}
