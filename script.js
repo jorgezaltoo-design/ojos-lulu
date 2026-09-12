@@ -1,5 +1,14 @@
 // --- CONFIGURACIÓN API GROQ ---
-const GROQ_API_KEY = "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"; 
+// Obtener API Key de almacenamiento local o pedirla si no existe
+let GROQ_API_KEY = localStorage.getItem('groq_api_key') || '';
+
+if (!GROQ_API_KEY) {
+    GROQ_API_KEY = prompt("Ingresa tu API Key de Groq (gsk_...):");
+    if (GROQ_API_KEY) {
+        localStorage.setItem('groq_api_key', GROQ_API_KEY.trim());
+    }
+}
+
 const GROQ_MODEL = "llama3-8b-8192";
 
 // Elementos DOM
